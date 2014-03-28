@@ -9,6 +9,7 @@ package "kakebo.py"{
 		+get_date()
 		+get_contents()
 		+obtain_income()
+		+output()
 	}
 	note right: wrapper object of date and contents
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3 
-from   json     import load     as _json_load
-from   copy     import deepcopy as _deepcopy
-from   datetime import datetime as _datetime
-from   math     import sqrt
-from   scipy	import stats	as _stats
+from sys      import stdout   as _stdout
+from json     import load     as _json_load
+from copy     import deepcopy as _deepcopy
+from datetime import datetime as _datetime
+from math     import sqrt
+from scipy    import stats    as _stats
 import scipy					as _scipy
 import numpy					as np
 
@@ -17,6 +18,10 @@ class Content:
 
 	def get_income(self):
 		return self._income
+
+	def __len__(self):
+		l = len(self.get_content_name())
+		return len(self.get_content_name())
 
 	def __repr__(self):
 		return 'Content<name={}, income={}>'.format(self._content_name, self._income)
@@ -97,6 +102,39 @@ class Kakebo:
 		l = len(incomes)
 		return _scipy.stats.linregress(incomes, range(l))[:2]
 
+	def output(self, outfile, indent=4):
+		""" output as a text file """
+		out = ''
+
+		max_len_of_content = max(len(content) for content in self._iter_content())
+		money = self._first_money
+
+		for daily in self:
+			year, month, day = daily.get_date().timetuple()[:3]
+			s_date = '{:02d}/{:02d}/{:02d}'.format(year, month,day)	
+				# string format of date
+			out += '=== {}\n'.format(s_date)
+			for content in daily:
+				money += content.get_income()
+				name = content.get_content_name()
+				out += '{space}{content}:{income}:{rest}\n'.format(
+							space = ' ' * indent,
+							content = name,
+							income = content.get_income(),
+							rest = money
+						)
+		out += '\n'
+
+		print(out, file=outfile)
+	
+	def _iter_content(self):
+		"""
+		iterator of contents
+		"""
+		for daily in self:
+			for content in daily:
+				yield content
+
 	def __getitem__(self, ind):
 		return self._dailies[ind]
 	
@@ -146,11 +184,16 @@ def obtain_correlation_test():
 	jf = open('kakebo.json')
 	kakebo = parse(jf)
 	print(kakebo.obtain_correlation_coefficient())
+
+def output_test():
+	jf = open('kakebo.json')
+	kakebo = parse(jf)
+	kakebo.output(outfile=_stdout)
 	
 def main(filename):
 	jf = open(filename, 'r')	
 	kakebo = parse(jf)
 	print(kakebo)
 
-obtain_correlation_test()
+output_test()
 
