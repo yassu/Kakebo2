@@ -40,6 +40,15 @@ class Daily:
     def get_date(self):
         return self._date
 
+    def get_year(self):
+        return self._date[0]
+
+    def get_month(self):
+        return self._date[1]
+
+    def get_day(self):
+        return self._date[2]
+
     def get_contents(self):
         return deepcopy(self._contents)
 
@@ -161,6 +170,10 @@ class Kakebo:
         for daily in self:
             for content in daily:
                 yield content
+
+    def act_filter(self, filter_method, filter_args):
+        self._dailies = list(filter(filter_method(*filter_args), self._dailies))
+        self._first_money = None    # means we cant't use this attribute
 
     def __len__(self):
         return len(self._dailies)
