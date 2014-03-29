@@ -1,4 +1,6 @@
 #!/usr/bin/env python3 
+from statics import ALL_STATS
+
 from sys      import stdout   as _stdout
 from json     import load     as _json_load
 from copy     import deepcopy as _deepcopy
@@ -146,6 +148,11 @@ class Kakebo:
         out += '\n'
 
         print(out, file=outfile)
+
+    def print_statics(self, outfile=_stdout):
+        for stat in ALL_STATS:
+            print(stat.rep_result(self), file=outfile)
+        
 	
     def _iter_content(self):
         """
@@ -154,6 +161,9 @@ class Kakebo:
         for daily in self:
             for content in daily:
                 yield content
+
+    def __len__(self):
+        return len(self._dailies)
 
     def __getitem__(self, ind):
         return self._dailies[ind]
@@ -190,11 +200,16 @@ def output_test():
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
     kakebo.output(outfile=_stdout)
+
+def main_test():
+    jf = open('kakebo.json')
+    kakebo = Kakebo.load_from_json(jf)
+    kakebo.print_statics()
 	
 def main(filename):
     jf = open(filename, 'r')	
-    kakebo = load_from_json(jf)
-    print(kakebo)
+    kakebo = Kakebo.load_from_json(jf)
+    kakebo.print_statics()
 
-output_test()
+main('kakebo.json')
 
