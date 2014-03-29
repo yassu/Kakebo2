@@ -6,9 +6,6 @@ from json     import load     as _json_load
 from copy     import deepcopy as _deepcopy
 from datetime import datetime as _datetime
 from math     import sqrt
-from scipy    import stats    as _stats
-import scipy                    as _scipy
-import numpy                    as np
 
 class Content:
     def __init__(self, content_name , income):
@@ -41,13 +38,19 @@ class Daily:
         return self._date
 
     def get_year(self):
-        return self._date[0]
+        return self._date.timetuple()[0]
 
     def get_month(self):
-        return self._date[1]
+        return self._date.timetuple()[1]
 
     def get_day(self):
-        return self._date[2]
+        return self._date.timetuple()[2]
+
+    def get_week_day(self):
+        """
+        0 means Monday and 6 means Sunday.
+        """
+        return self._date.timetuple()[6]
 
     def get_contents(self):
         return deepcopy(self._contents)
@@ -89,29 +92,6 @@ class Kakebo:
 
     def obtain_income(self):
         return sum(self.obtain_incomes())
-
-    def obtain_average_of_income(self):
-        return self.obtain_income()/len(self._dailies)
-
-    def obtain_variance_of_income(self):
-        incomes = self.obtain_incomes()
-        return sqrt(np.var(incomes))
-
-    def obtain_correlation_coefficient(self):
-        """
-        return correlation coefficient of incomes and straight data.
-        """
-        incomes = self.obtain_incomes()
-        l = len(incomes)
-        return np.corrcoef(incomes, range(l))[0][1]
-
-    def obtain_line_regression(self):
-        """
-		return list of (loop, sedgement)
-		"""
-        incomes = self.obtain_incomes()
-        l = len(incomes)
-        return _scipy.stats.linregress(incomes, range(l))[:2]
 
     @staticmethod
     def load_from_json(jf):
