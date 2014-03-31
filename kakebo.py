@@ -1,17 +1,21 @@
-#!/usr/bin/env python3 
+#!/usr/bin/env python3
 from statics import ALL_STATS
+from filter_methods import D_FILTER
+from optparse import OptionParser
 
-from sys      import stdout   as _stdout
-from json     import load     as _json_load
-from copy     import deepcopy as _deepcopy
+from sys import stdout as _stdout
+from json import load as _json_load
+from copy import deepcopy as _deepcopy
 from datetime import datetime as _datetime
-from math     import sqrt
+from math import sqrt
+
 
 class Content:
-    def __init__(self, content_name , income):
+
+    def __init__(self, content_name, income):
         self._content_name = content_name
         self._income = income
-	
+
     def get_content_name(self):
         return self._content_name
 
@@ -25,15 +29,17 @@ class Content:
     def __repr__(self):
         return 'Content<name={}, income={}>'.format(self._content_name, self._income)
 
+
 class Daily:
+
     def __init__(self, date):
         """ date is datetime instance """
         self._date = date
         self._contents = []
-	
+
     def append(self, content):
         self._contents.append(content)
-	
+
     def get_date(self):
         return self._date
 
@@ -62,31 +68,32 @@ class Daily:
         return self._contents[ind]
 
     def __repr__(self):
-        year  = self._date.year
+        year = self._date.year
         month = self._date.month
-        day   = self._date.day
+        day = self._date.day
         return '{year:04d}/{month:02d}/{day:02d}<{contents}>'.format(
-                year  = year,
-                month = month,
-                day   = day,
-                contents = self._contents) 
-		
+            year=year,
+            month=month,
+            day=day,
+            contents=self._contents)
+
 
 class Kakebo:
+
     def __init__(self, first_money):
         self._first_money = first_money
         self._dailies = []
-	
+
     def append(self, daily):
         self._dailies.append(daily)
-	
+
     def get_first_money(self):
         return self._first_money
-	
+
     def get_dailies(self):
         return deepcopy(self._dailies)
 
-    ## statics
+    # statics
     def obtain_incomes(self):
         return [daily.obtain_income() for daily in self._dailies]
 
@@ -122,18 +129,18 @@ class Kakebo:
 
         for daily in self:
             year, month, day = daily.get_date().timetuple()[:3]
-            s_date = '{:02d}/{:02d}/{:02d}'.format(year, month,day)	
+            s_date = '{:02d}/{:02d}/{:02d}'.format(year, month, day)
                 # string format of date
             out += '=== {}\n'.format(s_date)
             for content in daily:
                 money += content.get_income()
                 name = content.get_content_name()
                 out += '{space}{content}:{income}:{rest}\n'.format(
-                            space = ' ' * indent,
-                            content = name,
-                            income = content.get_income(),
-                            rest = money
-                        )
+                    space=' ' * indent,
+                    content=name,
+                    income=content.get_income(),
+                    rest=money
+                )
         out += '\n'
 
         print(out, file=outfile)
@@ -141,8 +148,7 @@ class Kakebo:
     def print_statics(self, outfile=_stdout):
         for stat in ALL_STATS:
             print(stat.rep_result(self), file=outfile)
-        
-	
+
     def _iter_content(self):
         """
         iterator of contents
@@ -152,7 +158,8 @@ class Kakebo:
                 yield content
 
     def act_filter(self, filter_method, filter_args):
-        self._dailies = list(filter(filter_method(*filter_args), self._dailies))
+        self._dailies = list(
+            filter(filter_method(*filter_args), self._dailies))
         self._first_money = None    # means we cant't use this attribute
 
     def __len__(self):
@@ -164,6 +171,7 @@ class Kakebo:
     def __repr__(self):
         return '\n'.join(map(str, self._dailies))
 
+
 def parse_date(s_date):
     year, month, day = map(int, s_date.split('/'))
     return _datetime(year, month, day)
@@ -174,35 +182,101 @@ def income_test():
     kakebo = Kakebo.load_from_json(jf)
     print(kakebo.obtain_income())
 
+
 def obtain_average_of_income_test():
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
     print(kakebo.obtain_average_of_income())
+
 
 def obtain_variance_of_income_test():
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
     print(kakebo.obtain_variance_of_income())
 
+
 def obtain_correlation_test():
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
     print(kakebo.obtain_correlation_coefficient())
+
 
 def output_test():
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
     kakebo.output(outfile=_stdout)
 
+
 def main_test():
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
     kakebo.print_statics()
-	
-def main(filename):
-    jf = open(filename, 'r')	
+
+
+def main(parser):
+    jf = open(filename, 'r')
     kakebo = Kakebo.load_from_json(jf)
     kakebo.print_statics()
 
-main('kakebo.json')
 
+def build_options(parser):
+    parser.add_option(
+        '-s', '--since',
+        action='store',
+        type='string',
+        dest='s_since_date',
+        help='since this date'
+    )
+    parser.add_option(
+        '-y', '--year',
+        action='store',
+        type='int',
+        dest='year',
+        help='decide year'
+    ),
+    parser.add_option(
+        '-m', '--month',
+        action='store',
+        type='int',
+        dest='month',
+        help='month'
+    )
+    parser.add_option(
+        '-d', '--day',
+        action='store',
+        type='int',
+        dest='day',
+        help='day'
+    ),
+    parser.add_option(
+        '-w', '--wday',
+        action='store',
+        type='string',
+        dest='wday',
+        help='weekday'
+    )
+
+if __name__ == '__main__':
+    is_main = True
+
+    if is_main:
+        parser = OptionParser()
+        build_options(parser)
+        (options, filenames) = parser.parse_args()
+        filename = filenames[-1]
+
+        kakebo = None
+        with open(filename, 'r') as jf:
+            kakebo = Kakebo.load_from_json(jf)
+
+        for filter_name, _filter in D_FILTER.items():
+            filter_args = None
+            if getattr(options, filter_name) is not None:
+                filter_args = None
+                if getattr(options, filter_name):
+                    filter_args = [getattr(options, filter_name)]
+                else:
+                    filter_args = []
+                kakebo.act_filter(_filter, filter_args)
+
+        kakebo.print_statics()
