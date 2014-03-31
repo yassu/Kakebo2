@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-from statics import ALL_STATS
+from statics        import ALL_STATS
 from filter_methods import D_FILTER
-from optparse import OptionParser
+from optparse       import OptionParser
 
-from sys import stdout as _stdout
-from json import load as _json_load
-from copy import deepcopy as _deepcopy
+from sys      import stdout   as _stdout
+from json     import load     as _json_load
+from copy     import deepcopy as _deepcopy
 from datetime import datetime as _datetime
 from math import sqrt
 
@@ -112,9 +112,11 @@ class Kakebo:
             date = parse_date(jdata[0])
             daily = Daily(date)
             del(jdata[0])
-
+            
             for a_content in jdata[0]:
                 s_content, income = a_content
+                if s_content.startswith('#'):
+                    continue
                 content = Content(s_content, income)
                 daily.append(content)
             del(jdata[0])
@@ -141,9 +143,7 @@ class Kakebo:
                     income=content.get_income(),
                     rest=money
                 )
-        out += '\n'
-
-        print(out, file=outfile)
+        print(out[:-2], file=outfile)   # delete new line and space
 
     def print_statics(self, outfile=_stdout):
         for stat in ALL_STATS:
@@ -162,6 +162,16 @@ class Kakebo:
             filter(filter_method(*filter_args), self._dailies))
         self._first_money = None    # means we cant't use this attribute
 
+    def plot(self):
+        """
+        plot graph of incomes by using matplotlib.pyplot
+        """
+        import pylab
+        incomes = pylab.array(self.obtain_incomes())
+        dates = pylab.array(range(len(incomes)))
+        pylab.plot(dates, incomes)
+        pylab.show()
+
     def __len__(self):
         return len(self._dailies)
 
@@ -175,6 +185,8 @@ class Kakebo:
 def parse_date(s_date):
     year, month, day = map(int, s_date.split('/'))
     return _datetime(year, month, day)
+
+# Tests
 
 
 def income_test():
@@ -220,6 +232,7 @@ def main(parser):
 
 
 def build_options(parser):
+    # assume fllowing dests of option == 
     parser.add_option(
         '-s', '--since',
         action='store',
@@ -233,7 +246,7 @@ def build_options(parser):
         type='int',
         dest='year',
         help='decide year'
-    ),
+    )
     parser.add_option(
         '-m', '--month',
         action='store',
@@ -247,7 +260,7 @@ def build_options(parser):
         type='int',
         dest='day',
         help='day'
-    ),
+    )
     parser.add_option(
         '-w', '--wday',
         action='store',
@@ -255,20 +268,36 @@ def build_options(parser):
         dest='wday',
         help='weekday'
     )
+    parser.add_option(
+        '-g', '--graph',
+        action='store_false',
+        dest='is_plotting',
+        help='plot datas'
+    )
+    parser.add_option(
+        '-t', '--text',
+        action='store_false',
+        dest='output_as_text',
+        help='output as plain text format'
+    )
 
 if __name__ == '__main__':
     is_main = True
 
     if is_main:
+        # define option
         parser = OptionParser()
         build_options(parser)
         (options, filenames) = parser.parse_args()
+        # print(options)
         filename = filenames[-1]
 
+        # define Kakebo
         kakebo = None
         with open(filename, 'r') as jf:
             kakebo = Kakebo.load_from_json(jf)
 
+        # pass filter
         for filter_name, _filter in D_FILTER.items():
             filter_args = None
             if getattr(options, filter_name) is not None:
@@ -279,4 +308,10 @@ if __name__ == '__main__':
                     filter_args = []
                 kakebo.act_filter(_filter, filter_args)
 
+        # outputs
         kakebo.print_statics()
+
+        if options.is_plotting is not None:
+            kakebo.plot()
+        if options.output_as_text is not None:
+            kakebo.output(outfile=_stdout)

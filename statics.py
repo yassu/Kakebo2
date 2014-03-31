@@ -36,16 +36,25 @@ class Variance(AbstractStatics):
 class LineRegression(AbstractStatics):
 
     def obtain_result(self, kakebo):
+        from scipy import polyfit
         incomes = kakebo.obtain_incomes()
-        l = len(incomes)
-        xs = incomes
-        bar_xs = sum(xs) / len(xs)
-        ys = range(l)
-        bar_ys = sum(ys) / len(ys)
-        loop = sum([(xs[i] - bar_xs) * (ys[i] - bar_ys)  for i in range(l)]) /    \
-            sum([(x - bar_xs) * (x - bar_xs) for x in xs])
-        sedgement = bar_ys - loop * bar_xs
-        return '{a}*x + {b}'.format(a=loop, b=sedgement)
+        xs = list(range(len(incomes)))
+        loop, sedgement = map(int, polyfit(xs, incomes, 1).tolist())
+
+        out = '{a} * x'.format(a=loop)
+
+        if sedgement == 0:
+            return out
+
+        sgn = ''
+        if sedgement > 0:
+            sgn = '+'
+        elif sedgement < 0:
+            sgn = '-'
+            sedgement *= (-1)
+
+        out += ' {sgn} {b}'.format(sgn=sgn, b=sedgement)
+        return out
 
     def __repr__(self):
         return 'line regression'
