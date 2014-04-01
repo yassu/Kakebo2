@@ -169,7 +169,21 @@ class Kakebo:
         import pylab
         incomes = pylab.array(self.obtain_incomes())
         dates = pylab.array(range(len(incomes)))
-        pylab.plot(dates, incomes)
+
+        pylab.suptitle('Kakebo')    # title of this graph
+
+        # draw datas
+        pylab.plot(dates, incomes, 'b-', label='data')
+
+        ## draw regression line
+            # loop and sedgement of regression line of this Kakebo
+        from scipy import polyfit
+        loop, sedgement = polyfit(dates, incomes, 1).tolist()
+        # plot regression line of incomes
+        pylab.plot(dates, [loop * x + sedgement for x in dates], 'r-', label='regression line')
+
+        # show graph
+        pylab.legend(loc='upper left')
         pylab.show()
 
     def __len__(self):
