@@ -12,15 +12,19 @@ from math import sqrt
 
 class Content:
 
-    def __init__(self, content_name, income):
+    def __init__(self, content_name, income, ignore_statics=False):
         self._content_name = content_name
         self._income = income
+        self._ignore_statics = ignore_statics
 
     def get_content_name(self):
         return self._content_name
 
     def get_income(self):
         return self._income
+
+    def get_ignore_statics(self):
+        return self._ignore_statics
 
     def __len__(self):
         l = len(self.get_content_name())
@@ -115,9 +119,10 @@ class Kakebo:
             
             for a_content in jdata[0]:
                 s_content, income = a_content
+                ignore_statics = False
                 if s_content.startswith('#'):
-                    continue
-                content = Content(s_content, income)
+                    ignore_statics = True
+                content = Content(s_content, income, ignore_statics=ignore_statics)
                 daily.append(content)
             del(jdata[0])
             kakebo.append(daily)
@@ -145,7 +150,20 @@ class Kakebo:
                 )
         print(out[:-2], file=outfile)   # delete new line and space
 
+    def _obtain_ignore_statics_contents(self):
+        kakebo = Kakebo(None)
+        for daily in self:
+            q_daily = Daily(daily.get_date())
+            for content in daily:
+                if content.get_ignore_statics() is False:
+                    print(content)
+                    q_daily.append(content)
+            kakebo.append(q_daily)
+        return kakebo
+
     def print_statics(self, outfile=_stdout):
+        # except ignore statics contents
+        kakebo = self._obtain_ignore_statics_contents()
         for stat in ALL_STATS:
             print(stat.rep_result(self), file=outfile)
 
