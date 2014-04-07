@@ -164,8 +164,10 @@ class Kakebo:
     def print_statics(self, outfile=_stdout):
         # except ignore statics contents
         kakebo = self._obtain_ignore_statics_contents()
+        print('static kakebo:')
+        print(kakebo)
         for stat in ALL_STATS:
-            print(stat.rep_result(self), file=outfile)
+            print(stat.rep_result(kakebo), file=outfile)
 
     def _iter_content(self):
         """
