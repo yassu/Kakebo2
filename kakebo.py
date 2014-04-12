@@ -324,8 +324,12 @@ if __name__ == '__main__':
         build_options(parser)
         (options, filenames) = parser.parse_args()
         # print(options)
-        filename = filenames[-1]
-
+        try:
+            filename = filenames[-1]
+        except IndexError:
+            print('Please enter filename.')
+            exit()
+        
         # define Kakebo
         kakebo = None
         with open(filename, 'r') as jf:
