@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = 'Ver1.2.0.7.5'
+__version__ = 'Ver1.2.1'
 d_date = {
     'Mon': 0,
     'Tue': 1,
