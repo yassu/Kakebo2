@@ -2,12 +2,13 @@
 from statics        import ALL_STATS
 from filter_methods import D_FILTER
 from optparse       import OptionParser
+from const          import __version__
 
-from sys      import stdout   as _stdout
-from json     import load     as _json_load
-from copy     import deepcopy as _deepcopy
-from datetime import datetime as _datetime
-from math import sqrt
+from sys            import stdout       as _stdout
+from json           import load         as _json_load
+from copy           import deepcopy     as _deepcopy
+from datetime       import datetime     as _datetime
+from math           import sqrt
 
 
 class Content:
@@ -22,6 +23,9 @@ class Content:
 
     def get_income(self):
         return self._income
+
+    def get_commentouted(self):
+        return self.get_content_name().startswith('#')
 
     def get_ignore_statics(self):
         return self._ignore_statics
@@ -46,6 +50,16 @@ class Daily:
 
     def get_date(self):
         return self._date
+
+    def _obtain_ignored_commentouted(self):
+        """ 
+        return Daily which ignored comentouted contents
+        """
+        daily = Daily(self.get_date())
+        for content in self:
+            if not content.get_commentouted():
+                daily.append(content)
+        return daily
 
     def get_year(self):
         return self._date.timetuple()[0]
@@ -72,9 +86,9 @@ class Daily:
         return self._contents[ind]
 
     def __repr__(self):
-        year = self._date.year
+        year  = self._date.year
         month = self._date.month
-        day = self._date.day
+        day   = self._date.day
         return '{year:04d}/{month:02d}/{day:02d}<{contents}>'.format(
             year=year,
             month=month,
@@ -103,6 +117,17 @@ class Kakebo:
 
     def obtain_income(self):
         return sum(self.obtain_incomes())
+
+    def _obtain_ignored_commentouted(self):
+        """
+        return kakebo which ignored commentouted.
+        """
+        kakebo = Kakebo(None)
+        for daily in self:
+            ignored_daily = daily._obtain_ignored_commentouted()
+            kakebo.append(ignored_daily)
+
+        return kakebo
 
     @staticmethod
     def load_from_json(jf):
@@ -150,22 +175,19 @@ class Kakebo:
                 )
         print(out[:-2], file=outfile)   # delete new line and space
 
-    def _obtain_ignore_statics_contents(self):
+    def _obtain_ignore_contents(self):
         kakebo = Kakebo(None)
         for daily in self:
             q_daily = Daily(daily.get_date())
             for content in daily:
                 if content.get_ignore_statics() is False:
-                    print(content)
                     q_daily.append(content)
             kakebo.append(q_daily)
         return kakebo
 
     def print_statics(self, outfile=_stdout):
         # except ignore statics contents
-        kakebo = self._obtain_ignore_statics_contents()
-        print('static kakebo:')
-        print(kakebo)
+        kakebo = self._obtain_ignore_contents()
         for stat in ALL_STATS:
             print(stat.rep_result(kakebo), file=outfile)
 
@@ -187,7 +209,8 @@ class Kakebo:
         plot graph of incomes by using matplotlib.pyplot
         """
         import pylab
-        incomes = pylab.array(self.obtain_incomes())
+        kakebo = self._obtain_ignored_commentouted()
+        incomes = pylab.array(kakebo.obtain_incomes())
         dates = pylab.array(range(len(incomes)))
 
         pylab.suptitle('Kakebo')    # title of this graph
@@ -306,7 +329,7 @@ def build_options(parser):
         '-g', '--graph',
         action='store_false',
         dest='is_plotting',
-        help='plot datas'
+        help='plot datas and regression line'
     )
     parser.add_option(
         '-t', '--text',
@@ -320,7 +343,7 @@ if __name__ == '__main__':
 
     if is_main:
         # define option
-        parser = OptionParser()
+        parser = OptionParser(version='{}'.format(__version__))
         build_options(parser)
         (options, filenames) = parser.parse_args()
         # print(options)
