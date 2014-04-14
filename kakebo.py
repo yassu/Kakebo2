@@ -150,7 +150,7 @@ class Kakebo:  # {{{
             for a_content in jdata[0]:
                 s_content, income = a_content
                 ignore_statics = False
-                if s_content.get_commentouted() is True:
+                if s_content.startswith('#') is True:
                     ignore_statics = True
                 content = Content(
                     s_content, income, ignore_statics=ignore_statics)
@@ -164,7 +164,7 @@ class Kakebo:  # {{{
         """ output as a text file """
         out = ''
 
-        money = self._first_money
+        rest_money = self._first_money
 
         for daily in self:
             year, month, day = daily.get_date().timetuple()[:3]
@@ -172,15 +172,16 @@ class Kakebo:  # {{{
                 # string format of date
             out += '=== {}\n'.format(s_date)
             for content in daily:
-                money += content.get_income()
-                name = content.get_content_name()
-                out += '{space}{content}:{income}:{rest}\n'.format(
-                    space=' ' * indent,
-                    content=name,
-                    income=content.get_income(),
-                    rest=money
+                income      = content.get_income()
+                rest_money += income
+                name        =  content.get_content_name()
+                out        += '{space}{content}:{income}:{rest}\n'.format(
+                    space   = ' ' * indent,
+                    content = name,
+                    income  = income,
+                    rest    = rest_money
                 )
-        print(out[:-2], file=outfile)   # delete new line and space
+        print(out[:-1], file=outfile)   # delete new line and space
     #}}}
 
     def _obtain_ignore_contents(self):  # {{{
@@ -188,7 +189,7 @@ class Kakebo:  # {{{
         for daily in self:
             q_daily = Daily(daily.get_date())
             for content in daily:
-                if content.get_ignore_statics() is False:
+                if content.get_commentouted() is False:
                     q_daily.append(content)
             kakebo.append(q_daily)
         return kakebo
