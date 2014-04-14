@@ -30,6 +30,10 @@ class Content:  # {{{
     def get_ignore_statics(self):  # {{{
         return self._ignore_statics  # }}}
 
+    def get_buildin(self):#{{{
+        return [self.get_content_name(), self.get_income()]
+    #}}}
+
     def __len__(self):  # {{{
         l = len(self.get_content_name())
         return len(self.get_content_name())  # }}}
@@ -83,6 +87,16 @@ class Daily:  # {{{
     def obtain_income(self):  # {{{
         return sum(content.get_income() for content in self._contents)  # }}}
 
+    def get_buildin(self):#{{{
+        s_date = '{year:%04d}/{month:%02d}/{day:%02d}'.format(
+
+                year=self.get_year(),
+                month=self.get_month(),
+                day=self.get_day()
+                )
+        return (s_date, [content.get_buildin() for content in self])
+        #}}}
+
     def __getitem__(self, ind):  # {{{
         return self._contents[ind]  # }}}
 
@@ -108,7 +122,8 @@ class Kakebo:  # {{{
         self._dailies.append(daily)  # }}}
 
     def get_first_money(self):  # {{{
-        return self._first_money  # }}}
+        return self._first_money  
+    # }}}
 
     def get_dailies(self):  # {{{
         return deepcopy(self._dailies)  # }}}
@@ -239,6 +254,15 @@ class Kakebo:  # {{{
         # show graph
         pylab.legend(loc='upper left')
         pylab.show()  # }}}
+
+    def get_buildin(self):#{{{
+        qed = [self.get_first_money()] 
+        for daily in self:
+            s_date, contents = daily.get_buildin()
+            qed.append(s_date) 
+            qed.append(contents)
+        return qed
+    #}}}
 
     def __len__(self):  # {{{
         return len(self._dailies)  # }}}
@@ -389,3 +413,4 @@ if __name__ == '__main__':  # {{{
             kakebo.plot()
         if options.output_as_text is not None:
             kakebo.output(outfile=_stdout)  # }}}#}}}#}}}
+
