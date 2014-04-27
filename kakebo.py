@@ -3,6 +3,8 @@ from statics import ALL_STATS
 from filter_methods import D_FILTER
 from optparse import OptionParser
 from const import __version__
+from utils import date_to_str as _date_to_str
+from utils import parse_date as _parse_date
 
 from sys import stdout as _stdout
 from json import load as _json_load
@@ -17,6 +19,10 @@ class Content:  # {{{
         self._content_name = content_name
         self._income = income
         self._ignore_statics = ignore_statics  # }}}
+
+    def get_buildin_obj(self): #{{{
+        return [self._content_name, self._income]
+    #}}}
 
     def get_content_name(self):  # {{{
         return self._content_name  # }}}
@@ -49,6 +55,12 @@ class Daily:  # {{{
         """ date is datetime instance """
         self._date = date
         self._contents = []  # }}}
+
+    def get_buildin_obj(self):  #{{{
+        buildin_contents = list(map(lambda content: content.get_buildin_obj(), 
+                self._contents))
+        s_date = _date_to_str(self._date)
+        return [s_date, buildin_contents]    #}}}
 
     def append(self, content):  # {{{
         self._contents.append(content)  # }}}
@@ -118,6 +130,14 @@ class Kakebo:  # {{{
         self._first_money = first_money
         self._dailies = []  # }}}
 
+    def get_buildin_obj(self):  #{{{
+        buildin_dailies = list(map(
+                lambda daily: daily.get_buildin_obj(),
+                self._dailies))
+        print(buildin_dailies)
+        return [self._first_money] + buildin_dailies
+    #}}}
+
     def append(self, daily):  # {{{
         self._dailies.append(daily)  # }}}
 
@@ -158,7 +178,7 @@ class Kakebo:  # {{{
         kakebo = Kakebo(first_money)
 
         while jdata:
-            date = parse_date(jdata[0])
+            date = _parse_date(jdata[0])
             daily = Daily(date)
             del(jdata[0])
 
@@ -376,6 +396,8 @@ def build_options(parser):  # {{{
     )  # }}}
 
 if __name__ == '__main__':  # {{{
+    from formatter import TextFormatter as _TextFormatter
+    from formatter import JsonFormatter as _JsonFormatter
     is_main = True
 
     if is_main:  # {{{
@@ -384,16 +406,21 @@ if __name__ == '__main__':  # {{{
         build_options(parser)
         (options, filenames) = parser.parse_args()
         # print(options)
+        input_formatter=None
         try:
             filename = filenames[-1]
+            if filename.split('.')[-1] == 'json':
+                input_formatter = _JsonFormatter()
+            elif filename.split('.')[-1] == 'txt':
+                input_formatter = _TextFormatter()
         except IndexError:
             print('Please enter filename.')
             exit()
 
         # define Kakebo
         kakebo = None
-        with open(filename, 'r') as jf:
-            kakebo = Kakebo.load_from_json(jf)
+        with open(filename, 'r') as f:
+            kakebo = input_formatter.load(f)
 
         # pass filter
         for filter_name, _filter in D_FILTER.items():
