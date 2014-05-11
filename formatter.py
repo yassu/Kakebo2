@@ -9,6 +9,18 @@ from utils import (is_dummy_str,
                    except_both_ends)
 #}}}
 
+def get_formatter(filename):   #{{{
+    d_format = {
+                '.json': JsonFormatter(),
+                '.txt':  TextFormatter()
+            }
+    for extension in d_format.keys():
+        if filename.endswith(extension):
+            return d_format[extension]
+
+    return None
+#}}}
+
 class Formatter:#{{{
     def load(self, f):#{{{
         """
@@ -145,5 +157,7 @@ def text_dump_test():   #{{{
     of = open('out_test_write.txt', 'w')
     formatter.dump(kakebo, of)
 #}}}
-    
+
 #}}}
+
+

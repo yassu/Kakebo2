@@ -169,55 +169,7 @@ class Kakebo:  # {{{
         return kakebo
     #}}}
 
-    @staticmethod
-    def load_from_json(jf):  # {{{
-        """ jf:  json file object """
-        jdata = _json_load(jf)
-        first_money = jdata[0]
-        del(jdata[0])
-        kakebo = Kakebo(first_money)
 
-        while jdata:
-            date = _parse_date(jdata[0])
-            daily = Daily(date)
-            del(jdata[0])
-
-            for a_content in jdata[0]:
-                s_content, income = a_content
-                ignore_statics = False
-                if s_content.startswith('#') is True:
-                    ignore_statics = True
-                content = Content(
-                    s_content, income, ignore_statics=ignore_statics)
-                daily.append(content)
-            del(jdata[0])
-            kakebo.append(daily)
-        return kakebo
-    #}}}
-
-    def output(self, outfile, indent=4):  # {{{
-        """ output as a text file """
-        out = ''
-
-        rest_money = self._first_money
-
-        for daily in self:
-            year, month, day = daily.get_date().timetuple()[:3]
-            s_date = '{:02d}/{:02d}/{:02d}'.format(year, month, day)
-                # string format of date
-            out += '=== {}\n'.format(s_date)
-            for content in daily:
-                income      = content.get_income()
-                rest_money += income
-                name        =  content.get_content_name()
-                out        += '{space}{content}:{income}:{rest}\n'.format(
-                    space   = ' ' * indent,
-                    content = name,
-                    income  = income,
-                    rest    = rest_money
-                )
-        print(out[:-1], file=outfile)   # delete new line and space
-    #}}}
 
     def _obtain_ignore_contents(self):  # {{{
         kakebo = Kakebo(None)
@@ -398,6 +350,7 @@ def build_options(parser):  # {{{
 if __name__ == '__main__':  # {{{
     from formatter import TextFormatter as _TextFormatter
     from formatter import JsonFormatter as _JsonFormatter
+    from formatter import get_formatter as _get_formatter
     is_main = True
 
     if is_main:  # {{{
@@ -439,5 +392,7 @@ if __name__ == '__main__':  # {{{
         if options.is_plotting is not None:
             kakebo.plot()
         if options.output_as_text is not None:
-            kakebo.output(outfile=_stdout)  # }}}#}}}#}}}
+            out_formatter = _get_formatter('.txt')
+            out_formatter.dump(kakebo, _stdout)
+            # }}}#}}}#}}}
 
