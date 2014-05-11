@@ -3,4 +3,5 @@ __pycache__/
 *.swp
 *.png
 
-* task.markdown
+task.markdown
+history.markdown

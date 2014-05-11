@@ -138,6 +138,10 @@ class Kakebo:  # {{{
         return [self._first_money] + buildin_dailies
     #}}}
 
+    def update(self, kakebo2):  #{{{
+        for diary in kakebo2:
+            self.append(diary)  #}}}
+
     def append(self, daily):  # {{{
         self._dailies.append(daily)  # }}}
 
@@ -358,22 +362,33 @@ if __name__ == '__main__':  # {{{
         parser = OptionParser(version='{}'.format(__version__))
         build_options(parser)
         (options, filenames) = parser.parse_args()
-        # print(options)
-        input_formatter=None
-        try:
-            filename = filenames[-1]
-            if filename.split('.')[-1] == 'json':
-                input_formatter = _JsonFormatter()
-            elif filename.split('.')[-1] == 'txt':
-                input_formatter = _TextFormatter()
-        except IndexError:
-            print('Please enter filename.')
+        
+        if len(filenames) == 0:
+            print('Please input Kakebo filename')
             exit()
 
         # define Kakebo
-        kakebo = None
+        ## define Kakebo with first_money
+        filename = filenames[0]
+        input_formatter = _get_formatter(filename)
         with open(filename, 'r') as f:
             kakebo = input_formatter.load(f)
+        del(input_formatter)
+        del(filename)
+        filenames = filenames[1:]
+
+        ## define continue filenames
+        kakebo2 = None
+        for filename in filenames:
+            input_formatter = _get_formatter(filename)
+            with open(filename, 'r') as f:
+                if kakebo2 is None:
+                    kakebo2 = input_formatter.load(f)
+                else:
+                    kakebo2.update(input_formatter.load(f))
+        if kakebo2 is not None:
+            kakebo.update(kakebo2)
+        del(kakebo2)
 
         # pass filter
         for filter_name, _filter in D_FILTER.items():
