@@ -3,5 +3,7 @@ __pycache__/
 *.swp
 *.png
 
+examples/
+
 task.markdown
 history.markdown
