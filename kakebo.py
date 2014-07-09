@@ -1,4 +1,4 @@
-# !/usr/bin/env python3#{{{#{{{
+# !/usr/bin/env python3
 from statics import ALL_STATS
 from filter_methods import D_FILTER
 from optparse import OptionParser
@@ -10,65 +10,65 @@ from sys import stdout as _stdout
 from json import load as _json_load
 from copy import deepcopy as _deepcopy
 from datetime import datetime as _datetime
-from math import sqrt  # }}}
+from math import sqrt  
 
 
-class Content:  # {{{
+class Content:  
 
-    def __init__(self, content_name, income, ignore_statics=False):  # {{{
+    def __init__(self, content_name, income, ignore_statics=False):  
         self._content_name = content_name
         self._income = income
-        self._ignore_statics = ignore_statics  # }}}
+        self._ignore_statics = ignore_statics  
 
-    def get_buildin_obj(self): #{{{
+    def get_buildin_obj(self): 
         return [self._content_name, self._income]
-    #}}}
+    
 
-    def get_content_name(self):  # {{{
-        return self._content_name  # }}}
+    def get_content_name(self):  
+        return self._content_name  
 
-    def get_income(self):  # {{{
-        return self._income  # }}}
+    def get_income(self):  
+        return self._income  
 
-    def get_commentouted(self):  # {{{
-        return self.get_content_name().startswith('#')  # }}}
+    def get_commentouted(self):  
+        return self.get_content_name().startswith('#')  
 
-    def get_ignore_statics(self):  # {{{
-        return self._ignore_statics  # }}}
+    def get_ignore_statics(self):  
+        return self._ignore_statics  
 
-    def get_buildin(self):#{{{
+    def get_buildin(self):
         return [self.get_content_name(), self.get_income()]
-    #}}}
+    
 
-    def __len__(self):  # {{{
+    def __len__(self):  
         l = len(self.get_content_name())
-        return len(self.get_content_name())  # }}}
+        return len(self.get_content_name())  
 
-    def __repr__(self):  # {{{
-        return 'Content<name={}, income={}>'.format(self._content_name, self._income)  # }}}
-#}}}
+    def __repr__(self):  
+        return 'Content<name={}, income={}>'.format(self._content_name, self._income)  
 
 
-class Daily:  # {{{
 
-    def __init__(self, date):  # {{{
+class Daily:  
+
+    def __init__(self, date):  
         """ date is datetime instance """
         self._date = date
-        self._contents = []  # }}}
+        self._contents = []  
 
-    def get_buildin_obj(self):  #{{{
+    def get_buildin_obj(self):  
         buildin_contents = list(map(lambda content: content.get_buildin_obj(), 
                 self._contents))
         s_date = _date_to_str(self._date)
-        return [s_date, buildin_contents]    #}}}
+        return [s_date, buildin_contents]    
 
-    def append(self, content):  # {{{
-        self._contents.append(content)  # }}}
+    def append(self, content):  
+        self._contents.append(content)  
 
-    def get_date(self):  # {{{
-        return self._date  # }}}
+    def get_date(self):  
+        return self._date  
 
-    def _obtain_ignored_commentouted(self):  # {{{
+    def _obtain_ignored_commentouted(self):  
         """
         return Daily which ignored comentouted contents
         """
@@ -76,30 +76,30 @@ class Daily:  # {{{
         for content in self:
             if not content.get_commentouted():
                 daily.append(content)
-        return daily  # }}}
+        return daily  
 
-    def get_year(self):  # {{{
-        return self._date.timetuple()[0]  # }}}
+    def get_year(self):  
+        return self._date.timetuple()[0]  
 
-    def get_month(self):  # {{{
-        return self._date.timetuple()[1]  # }}}
+    def get_month(self):  
+        return self._date.timetuple()[1]  
 
-    def get_day(self):  # {{{
-        return self._date.timetuple()[2]  # }}}
+    def get_day(self):  
+        return self._date.timetuple()[2]  
 
-    def get_week_day(self):  # {{{
+    def get_week_day(self):  
         """
         0 means Monday and 6 means Sunday.
         """
-        return self._date.timetuple()[6]  # }}}
+        return self._date.timetuple()[6]  
 
-    def get_contents(self):  # {{{
-        return deepcopy(self._contents)  # }}}
+    def get_contents(self):  
+        return deepcopy(self._contents)  
 
-    def obtain_income(self):  # {{{
-        return sum(content.get_income() for content in self._contents)  # }}}
+    def obtain_income(self):  
+        return sum(content.get_income() for content in self._contents)  
 
-    def get_buildin(self):#{{{
+    def get_buildin(self):
         s_date = '{year:%04d}/{month:%02d}/{day:%02d}'.format(
 
                 year=self.get_year(),
@@ -107,12 +107,12 @@ class Daily:  # {{{
                 day=self.get_day()
                 )
         return (s_date, [content.get_buildin() for content in self])
-        #}}}
+        
 
-    def __getitem__(self, ind):  # {{{
-        return self._contents[ind]  # }}}
+    def __getitem__(self, ind):  
+        return self._contents[ind]  
 
-    def __repr__(self):  # {{{
+    def __repr__(self):  
         year = self._date.year
         month = self._date.month
         day = self._date.day
@@ -120,48 +120,48 @@ class Daily:  # {{{
             year=year,
             month=month,
             day=day,
-            contents=self._contents)  # }}}
-#}}}
+            contents=self._contents)  
 
 
-class Kakebo:  # {{{
 
-    def __init__(self, first_money):  # {{{
+class Kakebo:  
+
+    def __init__(self, first_money):  
         self._first_money = first_money
-        self._dailies = []  # }}}
+        self._dailies = []  
 
-    def get_buildin_obj(self):  #{{{
+    def get_buildin_obj(self):  
         buildin_dailies = list(map(
                 lambda daily: daily.get_buildin_obj(),
                 self._dailies))
         print(buildin_dailies)
         return [self._first_money] + buildin_dailies
-    #}}}
+    
 
-    def update(self, kakebo2):  #{{{
+    def update(self, kakebo2):  
         for diary in kakebo2:
-            self.append(diary)  #}}}
+            self.append(diary)  
 
-    def append(self, daily):  # {{{
-        self._dailies.append(daily)  # }}}
+    def append(self, daily):  
+        self._dailies.append(daily)  
 
-    def get_first_money(self):  # {{{
+    def get_first_money(self):  
         return self._first_money  
-    # }}}
+    
 
-    def get_dailies(self):  # {{{
-        return deepcopy(self._dailies)  # }}}
+    def get_dailies(self):  
+        return deepcopy(self._dailies)  
 
     # statics
-    def obtain_incomes(self):  # {{{
+    def obtain_incomes(self):  
         return [daily.obtain_income() for daily in self._dailies]
-    #}}}
+    
 
-    def obtain_income(self):  # {{{
+    def obtain_income(self):  
         return sum(self.obtain_incomes())
-    #}}}
+    
 
-    def _obtain_ignored_commentouted(self):  # {{{
+    def _obtain_ignored_commentouted(self):  
         """
         return kakebo which ignored commentouted.
         """
@@ -171,11 +171,11 @@ class Kakebo:  # {{{
             kakebo.append(ignored_daily)
 
         return kakebo
-    #}}}
+    
 
 
 
-    def _obtain_ignore_contents(self):  # {{{
+    def _obtain_ignore_contents(self):  
         kakebo = Kakebo(None)
         for daily in self:
             q_daily = Daily(daily.get_date())
@@ -184,28 +184,28 @@ class Kakebo:  # {{{
                     q_daily.append(content)
             kakebo.append(q_daily)
         return kakebo
-    #}}}
+    
 
-    def print_statics(self, outfile=_stdout):  # {{{
+    def print_statics(self, outfile=_stdout):  
         # except ignore statics contents
         kakebo = self._obtain_ignore_contents()
         for stat in ALL_STATS:
-            print(stat.rep_result(kakebo), file=outfile)  # }}}
+            print(stat.rep_result(kakebo), file=outfile)  
 
-    def _iter_content(self):  # {{{
+    def _iter_content(self):  
         """
         iterator of contents
         """
         for daily in self:
             for content in daily:
-                yield content  # }}}
+                yield content  
 
-    def act_filter(self, filter_method, filter_args):  # {{{
+    def act_filter(self, filter_method, filter_args):  
         self._dailies = list(
             filter(filter_method(*filter_args), self._dailies))
-        self._first_money = None    # means we cant't use this attribute#}}}
+        self._first_money = None    # means we cant't use this attribute
 
-    def plot(self):  # {{{
+    def plot(self):  
         """
         plot graph of incomes by using matplotlib.pyplot
         """
@@ -229,79 +229,79 @@ class Kakebo:  # {{{
 
         # show graph
         pylab.legend(loc='upper left')
-        pylab.show()  # }}}
+        pylab.show()  
 
-    def get_buildin(self):#{{{
+    def get_buildin(self):
         qed = [self.get_first_money()] 
         for daily in self:
             s_date, contents = daily.get_buildin()
             qed.append(s_date) 
             qed.append(contents)
         return qed
-    #}}}
+    
 
-    def __len__(self):  # {{{
-        return len(self._dailies)  # }}}
+    def __len__(self):  
+        return len(self._dailies)  
 
-    def __getitem__(self, ind):  # {{{
-        return self._dailies[ind]  # }}}
+    def __getitem__(self, ind):  
+        return self._dailies[ind]  
 
-    def __repr__(self):  # {{{
-        return '\n'.join(map(str, self._dailies))  # }}}
-#}}}
+    def __repr__(self):  
+        return '\n'.join(map(str, self._dailies))  
 
 
-def parse_date(s_date):  # {{{
+
+def parse_date(s_date):  
     year, month, day = map(int, s_date.split('/'))
-    return _datetime(year, month, day)  # }}}
+    return _datetime(year, month, day)  
 
-# Tests#{{{
+# Tests
 
 
-def income_test():  # {{{
+def income_test():  
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
-    print(kakebo.obtain_income())  # }}}
+    print(kakebo.obtain_income())  
 
 
-def obtain_average_of_income_test():  # {{{
+def obtain_average_of_income_test():  
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
-    print(kakebo.obtain_average_of_income())  # }}}
+    print(kakebo.obtain_average_of_income())  
 
 
-def obtain_variance_of_income_test():  # {{{
+def obtain_variance_of_income_test():  
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
-    print(kakebo.obtain_variance_of_income())  # }}}
+    print(kakebo.obtain_variance_of_income())  
 
 
-def obtain_correlation_test():  # {{{
+def obtain_correlation_test():  
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
-    print(kakebo.obtain_correlation_coefficient())  # }}}
+    print(kakebo.obtain_correlation_coefficient())  
 
 
-def output_test():  # {{{
+def output_test():  
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
-    kakebo.output(outfile=_stdout)  # }}}
+    kakebo.output(outfile=_stdout)  
 
 
-def main_test():  # {{{
+def main_test():  
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
-    kakebo.print_statics()  # }}}
-#}}}
+    kakebo.print_statics()  
 
 
-def main(parser):  # {{{
+
+def main(parser):  
     jf = open(filename, 'r')
     kakebo = Kakebo.load_from_json(jf)
-    kakebo.print_statics()  # }}}
+    kakebo.print_statics()  
 
 
-def build_options(parser):  # {{{
+def build_options(parser):  
     # assume fllowing dests of option ==
     parser.add_option(
         '-s', '--since',
@@ -349,15 +349,15 @@ def build_options(parser):  # {{{
         action='store_false',
         dest='output_as_text',
         help='output as plain text format'
-    )  # }}}
+    )  
 
-if __name__ == '__main__':  # {{{
+if __name__ == '__main__':  
     from formatter import TextFormatter as _TextFormatter
     from formatter import JsonFormatter as _JsonFormatter
     from formatter import get_formatter as _get_formatter
     is_main = True
 
-    if is_main:  # {{{
+    if is_main:  
         # define option
         parser = OptionParser(version='{}'.format(__version__))
         build_options(parser)
@@ -409,5 +409,5 @@ if __name__ == '__main__':  # {{{
         if options.output_as_text is not None:
             out_formatter = _get_formatter('.txt')
             out_formatter.dump(kakebo, _stdout)
-            # }}}#}}}#}}}
+            
 

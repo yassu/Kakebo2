@@ -8,7 +8,7 @@ each functions returns function daily -> bool
 from const import d_date as _d_date
 
 
-def since_filter(s_since):  # {{{
+def since_filter(s_since):  
     a_sp = s_since.split('/')
     for i in range(len(a_sp)):
         if a_sp[i] == '':
@@ -41,27 +41,27 @@ def since_filter(s_since):  # {{{
             return False
         return True
 
-    return f  # }}}
+    return f  
 
 
-def equal_to_year_filter(y):  # {{{
-    return lambda daily: daily.get_year() == y  # }}}
+def equal_to_year_filter(y):  
+    return lambda daily: daily.get_year() == y  
 
 
-def equal_to_month_filter(m):  # {{{
-    return lambda daily: daily.get_month() == m  # }}}
+def equal_to_month_filter(m):  
+    return lambda daily: daily.get_month() == m  
 
 
-def equal_to_day_filter(d):  # {{{
-    return lambda daily: daily.get_day() == d  # }}}
+def equal_to_day_filter(d):  
+    return lambda daily: daily.get_day() == d  
 
 
-def equal_to_week_day_filter(s_wday):  # {{{
+def equal_to_week_day_filter(s_wday):  
     """
     wday in (0, 1, 2, 3, 4, 5, 6)
     0 means Monday and 6 means Sunday.
     """
-    return lambda daily: daily.get_week_day() == _d_date[s_wday]  # }}}
+    return lambda daily: daily.get_week_day() == _d_date[s_wday]  
 
 D_FILTER = {
     's_since_date': since_filter,

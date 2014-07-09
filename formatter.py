@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 #{{{#{{{
+#!/usr/bin/env python3 
 from kakebo import Kakebo, Daily, Content
 from utils import parse_date as _parse_date
 from datetime import datetime as _datetime
@@ -7,9 +7,9 @@ from json import dump as _json_dump
 from utils import (is_dummy_str,
                    except_head_of_space,
                    except_both_ends)
-#}}}
 
-def get_formatter(filename):   #{{{
+
+def get_formatter(filename):   
     d_format = {
                 '.json': JsonFormatter(),
                 '.txt':  TextFormatter()
@@ -19,23 +19,23 @@ def get_formatter(filename):   #{{{
             return d_format[extension]
 
     return None
-#}}}
 
-class Formatter:#{{{
-    def load(self, f):#{{{
+
+class Formatter:
+    def load(self, f):
         """
         @param: f: file object
         return Kakebo object
-        """#}}}
+        """
 
-    def dump(self, kakebo, f, indent=4):#{{{
+    def dump(self, kakebo, f, indent=4):
         """
         save kakebo object to f.
-        """#}}}
-#}}}
+        """
 
-class TextFormatter:   # {{{
-    def load(self, f):#{{{
+
+class TextFormatter:   
+    def load(self, f):
         """
         load: file object -> Kakebo
         return Kakebo Object from file object which is text-format
@@ -76,9 +76,9 @@ class TextFormatter:   # {{{
             daily.append(content)
         kakebo.append(daily)
         return kakebo
-        #}}}
+        
 
-    def dump(self, kakebo, f, indent=4):#{{{
+    def dump(self, kakebo, f, indent=4):
         out = ''
 
         rest_money = kakebo.get_first_money()
@@ -99,11 +99,11 @@ class TextFormatter:   # {{{
                     rest    = rest_money
                 )
         print(out[:-1], file=f)   # delete new line and space
-    #}}}
-#}}}
+    
 
-class JsonFormatter: #{{{
-    def load(self, jf): #{{{
+
+class JsonFormatter: 
+    def load(self, jf): 
         """ jf:  json file object """
         jdata = _json_load(jf)
         first_money = jdata[0]
@@ -126,15 +126,15 @@ class JsonFormatter: #{{{
             del(jdata[0])
             kakebo.append(daily)
         return kakebo
-    #}}}
+    
 
-    def dump(self, kakebo, f, indent=4):#{{{
+    def dump(self, kakebo, f, indent=4):
         _json_dump(kakebo.get_buildin_obj(), f, indent=indent)
-    #}}}
-#}}}
+    
 
-#test #{{{
-def json_test():#{{{
+
+#test 
+def json_test():
     # load_test
     json_filename = 'kakebo.json'
     jf = open(json_filename, 'r')
@@ -144,9 +144,9 @@ def json_test():#{{{
 
     jf2 = open('kakebo2.json', 'w')
     formatter.dump(kakebo, jf2)
-#}}}
 
-def text_dump_test():   #{{{
+
+def text_dump_test():   
     # load
     filename = 'out_test.txt'
     formatter = JsonFormat()
@@ -156,8 +156,8 @@ def text_dump_test():   #{{{
 
     of = open('out_test_write.txt', 'w')
     formatter.dump(kakebo, of)
-#}}}
 
-#}}}
+
+
 
 
