@@ -12,7 +12,8 @@ from utils import (is_dummy_str,
 def get_formatter(filename):   
     d_format = {
                 '.json': JsonFormatter(),
-                '.txt':  TextFormatter()
+                '.txt':  TextFormatter(),
+                '.yaml': YamlFormatter()
             }
     for extension in d_format.keys():
         if filename.endswith(extension):
@@ -199,4 +200,5 @@ def yaml_format_test():
     of = open('out_test.yaml', 'w')
     formatter.dump(kakebo, of)
 
-yaml_format_test()
+if __name__ == '__main__':
+    yaml_format_test()

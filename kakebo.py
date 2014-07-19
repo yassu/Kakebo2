@@ -354,6 +354,7 @@ def build_options(parser):
 if __name__ == '__main__':  
     from formatter import TextFormatter as _TextFormatter
     from formatter import JsonFormatter as _JsonFormatter
+    from formatter import YamlFormatter as _YamlFormatter
     from formatter import get_formatter as _get_formatter
     is_main = True
 
@@ -409,5 +410,3 @@ if __name__ == '__main__':
         if options.output_as_text is not None:
             out_formatter = _get_formatter('.txt')
             out_formatter.dump(kakebo, _stdout)
-            
-
