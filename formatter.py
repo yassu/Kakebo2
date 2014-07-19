@@ -34,15 +34,14 @@ class Formatter:
         """
 
 
-class TextFormatter:   
+class TextFormatter(Formatter):   
     def load(self, f):
         """
         load: file object -> Kakebo
         return Kakebo Object from file object which is text-format
         """
-        kakebo = None
         defined_first_money = False
-        first_money         = Kakebo(None)
+        first_money         = None
         kakebo = None
         daily = None
 
@@ -102,10 +101,11 @@ class TextFormatter:
     
 
 
-class JsonFormatter: 
-    def load(self, jf): 
+class JsonFormatter(Formatter): 
+    def load(self, yf): 
         """ jf:  json file object """
-        jdata = _json_load(jf)
+        ydata = _json_load(yf)
+        print(ydata)
         first_money = jdata[0]
         del(jdata[0])
         kakebo = Kakebo(first_money)
@@ -131,6 +131,35 @@ class JsonFormatter:
     def dump(self, kakebo, f, indent=4):
         _json_dump(kakebo.get_buildin_obj(), f, indent=indent)
     
+class YamlFormatter(Formatter):
+    """ Formatter for yaml language """
+    def load(self, f):
+        from yaml import load as yaml_load
+        ydata = yaml_load(f)
+        first_money = ydata[0]
+        del(ydata[0])
+        kakebo = Kakebo(first_money)
+
+        while ydata:
+            date = _parse_date(ydata[0])
+            daily = Daily(date)
+            del(ydata[0])
+
+            for a_content in ydata[0]:
+                s_content, income = a_content
+                ignore_statics = False
+                if s_content.startswith('#') is True:
+                    ignore_statics = True
+                content = Content(
+                    s_content, income, ignore_statics=ignore_statics)
+                daily.append(content)
+            del(ydata[0])
+            kakebo.append(daily)
+        return kakebo
+
+    def dump(self, kakebo, f, indent=4):
+        from yaml import dump as _yson_dump
+        _yson_dump(kakebo.get_buildin_obj(), f, indent=indent)
 
 
 #test 
@@ -154,10 +183,20 @@ def text_dump_test():
     kakebo = formatter.load(f)
     print(kakebo)
 
+    # dump
     of = open('out_test_write.txt', 'w')
     formatter.dump(kakebo, of)
 
+def yaml_format_test():
+    filename = 'input_test.yaml'
+    formatter = YamlFormatter()
+    f = open(filename, 'r')
+    
+    # load test
+    kakebo = formatter.load(f)
+    
+    # dump test
+    of = open('out_test.yaml', 'w')
+    formatter.dump(kakebo, of)
 
-
-
-
+yaml_format_test()
