@@ -1,4 +1,5 @@
-# !/usr/bin/env python3
+#!/usr/bin/env python3
+
 from statics import ALL_STATS
 from filter_methods import D_FILTER
 from optparse import OptionParser

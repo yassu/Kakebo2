@@ -4,9 +4,7 @@ from utils import parse_date as _parse_date
 from datetime import datetime as _datetime
 from json import load as _json_load
 from json import dump as _json_dump
-from utils import (is_dummy_str,
-                   except_head_of_space,
-                   except_both_ends)
+from utils import (is_dummy_str)
 
 
 def get_formatter(filename):   
@@ -50,13 +48,13 @@ class TextFormatter(Formatter):
             if is_dummy_str(line):
                 continue
             
-            line = except_head_of_space(line)
+            line = lstrip(line)
             line = line.rstrip()
 
             # case: date
             if line.startswith('==='):
                 line = line[len('==='): ]
-                line = except_head_of_space(line)
+                line = lstrip(line)
                 date = _parse_date(line)
                 if daily is not None:
                     kakebo.append(daily)
@@ -66,7 +64,7 @@ class TextFormatter(Formatter):
             # case: content
             content_name, income, rest = line.split(':')
             content_name, income, rest = map(
-                    except_both_ends, 
+                    rstrip, 
                     (content_name, income, rest))
             rest, income = map(int, (rest, income))
             if kakebo is None:
@@ -103,10 +101,9 @@ class TextFormatter(Formatter):
 
 
 class JsonFormatter(Formatter): 
-    def load(self, yf): 
+    def load(self, jf): 
         """ jf:  json file object """
-        ydata = _json_load(yf)
-        print(ydata)
+        jdata = _json_load(jf)
         first_money = jdata[0]
         del(jdata[0])
         kakebo = Kakebo(first_money)

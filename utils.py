@@ -1,6 +1,7 @@
 #!/usr/bin/env python3  
 from itertools import dropwhile as _dropwhile
 from datetime import datetime as _datetime
+from re import sub as _re_sub
 
 DUMPTY_CHARS = ('\n', '\t', ' ', '\r')
 
@@ -8,11 +9,8 @@ def trim(s):
     """
     trim: string -> string
     ignore space charactors
-    >>> trim('tjwppowqp')
-    'tjwppowqp'
     """
-    rm = lambda c: True if c not in DUMPTY_CHARS else False
-    return ''.join(list(filter(rm, s)))
+    return _re_sub('[\n\r\t ]','',s)
 
 
 def is_dummy_str(text): 
@@ -32,30 +30,9 @@ def parse_date(s_date):
     year, month, day = map(int, s_date.split('/'))
     return _datetime(year, month, day) 
 
-
-def except_head_of_space(text): 
-    """
-    except_head_of_test: str -> str
-    ignore head of white space
-    """
-    while len(text) > 0 and text[0] in DUMPTY_CHARS:
-        text = text[1:]
-    return text
-
-
-def except_tail_of_space(text): 
-    """
-    except_tail_of_test: str -> str
-    ignore tail of white space
-    """
-    while len(text) > 0 and text[-1] in DUMPTY_CHARS:
-        text = text[:-1]
-    return text
-
-
-def except_both_ends(text): 
-    return except_tail_of_space(except_head_of_space(text))
-
+def trim_test():
+    s = ' 12  3 4  56 7 8 9'
+    assert(trim(s) == '123456789')
 
 def is_dummy_str_test():
     dummy_text = '  \n  \r  \t  '
@@ -63,18 +40,7 @@ def is_dummy_str_test():
 
     non_dummy_text = 'ahfp   qrjpq   '
     print(is_dummy_str(non_dummy_text))  # -> False
-    
 
 
-def except_both_ends_test():    
-    text = '  ab  c  def '
-    print(except_both_ends(text))
-
-
-
-if __name__ == '__main__':  
-    import doctest
-    doctest.testmod()
-    s = trim('  \n tjwp  \n powqp \t  ')
-
-
+if __name__ == '__main__':
+    trim_test()
