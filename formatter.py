@@ -1,11 +1,17 @@
 #!/usr/bin/env python3 
+
+
 from kakebo import Kakebo, Daily, Content
 from utils import parse_date as _parse_date
 from datetime import datetime as _datetime
 from json import load as _json_load
 from json import dump as _json_dump
 from utils import (is_dummy_str)
-
+from exceptions import (
+                     IllegalFormatException,
+                     FirstMoneyNotFoundException,
+                     IllegalItemException)
+from sys import stderr
 
 def get_formatter(filename):   
     d_format = {
@@ -104,12 +110,21 @@ class JsonFormatter(Formatter):
     def load(self, jf): 
         """ jf:  json file object """
         jdata = _json_load(jf)
-        first_money = jdata[0]
-        del(jdata[0])
+        try:
+            first_money = jdata[0]
+            if type(first_money) != int:
+                raise FirstMoneyNotFoundException('First Money Not Found')
+            del(jdata[0])
+        except IndexError:
+            raise FirstMoneyNotFoundException('First Money Not Found')
+
         kakebo = Kakebo(first_money)
 
         while jdata:
-            date = _parse_date(jdata[0])
+            try:
+                date = _parse_date(jdata[0])
+            except IllegalDateException as e:
+                stderr.write(e)
             daily = Daily(date)
             del(jdata[0])
 
@@ -124,7 +139,6 @@ class JsonFormatter(Formatter):
             del(jdata[0])
             kakebo.append(daily)
         return kakebo
-    
 
     def dump(self, kakebo, f, indent=4):
         _json_dump(kakebo.get_buildin_obj(), f, indent=indent)
@@ -160,8 +174,10 @@ class YamlFormatter(Formatter):
         _yson_dump(kakebo.get_buildin_obj(), f, indent=indent)
 
 
-#test 
-def json_test():
+### tests
+
+## for json files
+def llegal_json_test():
     # load_test
     json_filename = 'kakebo.json'
     jf = open(json_filename, 'r')
@@ -172,6 +188,12 @@ def json_test():
     jf2 = open('kakebo2.json', 'w')
     formatter.dump(kakebo, jf2)
 
+def without_firstmoney_json_test():
+    json_filename = 'without_firstmoney.json'
+    formatter = JsonFormatter()
+    jf = open(json_filename, 'r')
+    kakebo = formatter.load(jf)
+        # FirstMoenyNotFoundException
 
 def text_dump_test():   
     # load
@@ -196,6 +218,3 @@ def yaml_format_test():
     # dump test
     of = open('out_test.yaml', 'w')
     formatter.dump(kakebo, of)
-
-if __name__ == '__main__':
-    yaml_format_test()

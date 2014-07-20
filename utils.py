@@ -2,6 +2,7 @@
 from itertools import dropwhile as _dropwhile
 from datetime import datetime as _datetime
 from re import sub as _re_sub
+from exceptions import IllegalDateException
 
 DUMPTY_CHARS = ('\n', '\t', ' ', '\r')
 
@@ -28,7 +29,10 @@ def parse_date(s_date):
         s_date = s_date[:-1]
 
     year, month, day = map(int, s_date.split('/'))
-    return _datetime(year, month, day) 
+    try:
+        return _datetime(year, month, day) 
+    except ValueError:
+        raise IllegalDateException('{} is Illegal date'.format(s_date))
 
 def trim_test():
     s = ' 12  3 4  56 7 8 9'
@@ -41,6 +45,7 @@ def is_dummy_str_test():
     non_dummy_text = 'ahfp   qrjpq   '
     print(is_dummy_str(non_dummy_text))  # -> False
 
+def parse_date_test():
+    date_s = '2014/03/24'
+    print(parse_date(date_s))
 
-if __name__ == '__main__':
-    trim_test()
