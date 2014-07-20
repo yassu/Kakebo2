@@ -302,6 +302,7 @@ def main(parser):
     kakebo.print_statics()  
 
 
+
 def build_options(parser):  
     # assume fllowing dests of option ==
     parser.add_option(
@@ -346,11 +347,58 @@ def build_options(parser):
         help='plot datas and regression line'
     )
     parser.add_option(
+        '--statics',
+        action='store_true',
+        dest='is_statics',
+        help='print result of basic analysis'
+    )
+    parser.add_option(
         '-t', '--text',
         action='store_false',
         dest='output_as_text',
         help='output as plain text format'
     )  
+
+def do_statics(kakebo):
+    """
+    clojure
+    """
+    _do_statics = lambda: kakebo.print_statics()
+    return _do_statics
+
+def do_plot(kakebo):
+    _do_plot = lambda: kakebo.plot()
+    return _do_plot
+
+def do_output_as_text(kakebo):
+    def _do_output_as_text():
+        out_formatter = _get_formatter('.txt')
+        out_formatter.dump(kakebo, _stdout)
+    return _do_output_as_text
+
+def do_option(kakebo, options):
+    use_options = filter(
+            lambda opt: getattr(options, opt) is not None, 
+            ('is_statics', 
+             'is_plotting', 
+             'output_as_text'))
+    use_options = list(use_options)
+
+    if len(use_options) > 1:
+        raise ValueError('too much options')
+
+    if use_options == []:
+        use_option = 'is_statics'
+    else:   # len(use_options) == 1
+        use_option = use_options[0]
+
+    # do function concerned with option
+    {
+        'is_statics': do_statics(kakebo),
+        'is_plotting': do_plot(kakebo),
+        'output_as_text': do_output_as_text(kakebo)
+    }[use_option]()
+
 
 if __name__ == '__main__':  
     from formatter import TextFormatter as _TextFormatter
@@ -404,10 +452,4 @@ if __name__ == '__main__':
                 kakebo.act_filter(_filter, filter_args)
 
         # outputs
-        kakebo.print_statics()
-
-        if options.is_plotting is not None:
-            kakebo.plot()
-        if options.output_as_text is not None:
-            out_formatter = _get_formatter('.txt')
-            out_formatter.dump(kakebo, _stdout)
+        do_option(kakebo, options)
