@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 *.swp
 *.png
+readme.html
 
 examples/
 
