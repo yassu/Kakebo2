@@ -400,7 +400,7 @@ def do_option(kakebo, options):
     }[use_option]()
 
 
-if __name__ == '__main__':
+def main():
     from formatter import TextFormatter as _TextFormatter
     from formatter import JsonFormatter as _JsonFormatter
     from formatter import YamlFormatter as _YamlFormatter
