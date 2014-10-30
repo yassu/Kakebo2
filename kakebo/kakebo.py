@@ -381,7 +381,6 @@ def do_option(kakebo, options):
 
 
 def main():
-
     # define option
     parser = OptionParser(version='{}'.format(__version__))
     build_options(parser)
