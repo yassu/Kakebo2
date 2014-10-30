@@ -6,7 +6,8 @@ from kakebo.utils import parse_date as _parse_date
 from json import load as _json_load
 from json import dump as _json_dump
 from kakebo.utils import (is_dummy_str)
-from kakebo.exceptions import (FirstMoneyNotFoundException)
+from kakebo.exceptions import (FirstMoneyNotFoundException,
+                               IllegalDateException)
 from sys import stderr
 
 
