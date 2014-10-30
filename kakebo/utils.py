@@ -2,7 +2,7 @@
 from itertools import dropwhile as _dropwhile
 from datetime import datetime as _datetime
 from re import sub as _re_sub
-from exceptions import IllegalDateException
+from kakebo.exceptions import IllegalDateException
 
 DUMPTY_CHARS = ('\n', '\t', ' ', '\r')
 

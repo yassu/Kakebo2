@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-from statics import ALL_STATS
-from filter_methods import D_FILTER
+from kakebo.statics import ALL_STATS
+from kakebo.filter_methods import D_FILTER
 from optparse import OptionParser
-from const import __version__
-from utils import date_to_str as _date_to_str
-from utils import parse_date as _parse_date
+from kakebo.const import __version__
+from kakebo.utils import date_to_str as _date_to_str
+from kakebo.utils import parse_date as _parse_date
 
 from sys import stdout as _stdout
 from json import load as _json_load
@@ -401,10 +401,10 @@ def do_option(kakebo, options):
 
 
 def main():
-    from formatter import TextFormatter as _TextFormatter
-    from formatter import JsonFormatter as _JsonFormatter
-    from formatter import YamlFormatter as _YamlFormatter
-    from formatter import get_formatter as _get_formatter
+    from kakebo.formatter import TextFormatter as _TextFormatter
+    from kakebo.formatter import JsonFormatter as _JsonFormatter
+    from kakebo.formatter import YamlFormatter as _YamlFormatter
+    from kakebo.formatter import get_formatter as _get_formatter
 
     # define option
     parser = OptionParser(version='{}'.format(__version__))

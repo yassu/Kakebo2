@@ -5,7 +5,7 @@ filter methods.
 each functions returns function daily -> bool
 """
 
-from const import d_date as _d_date
+from kakebo.const import d_date as _d_date
 
 
 def since_filter(s_since):  
