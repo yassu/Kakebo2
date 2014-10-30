@@ -5,13 +5,11 @@ from kakebo.filter_methods import D_FILTER
 from optparse import OptionParser
 from kakebo.const import __version__
 from kakebo.utils import date_to_str as _date_to_str
-from kakebo.utils import parse_date as _parse_date
+from copy import deepcopy
+from kakebo.formatter import get_formatter as _get_formatter
 
 from sys import stdout as _stdout
-from json import load as _json_load
-from copy import deepcopy as _deepcopy
 from datetime import datetime as _datetime
-from math import sqrt
 
 
 class Content:
@@ -23,7 +21,6 @@ class Content:
 
     def get_buildin_obj(self):
         return [self._content_name, self._income]
-
 
     def get_content_name(self):
         return self._content_name
@@ -40,14 +37,12 @@ class Content:
     def get_buildin(self):
         return [self.get_content_name(), self.get_income()]
 
-
     def __len__(self):
-        l = len(self.get_content_name())
         return len(self.get_content_name())
 
     def __repr__(self):
-        return 'Content<name={}, income={}>'.format(self._content_name, self._income)
-
+        return 'Content<name={}, income={}>'.format(
+            self._content_name, self._income)
 
 
 class Daily:
@@ -59,7 +54,7 @@ class Daily:
 
     def get_buildin_obj(self):
         buildin_contents = list(map(lambda content: content.get_buildin_obj(),
-                self._contents))
+                                    self._contents))
         s_date = _date_to_str(self._date)
         return [s_date, buildin_contents]
 
@@ -103,12 +98,11 @@ class Daily:
     def get_buildin(self):
         s_date = '{year:%04d}/{month:%02d}/{day:%02d}'.format(
 
-                year=self.get_year(),
-                month=self.get_month(),
-                day=self.get_day()
-                )
+            year=self.get_year(),
+            month=self.get_month(),
+            day=self.get_day()
+        )
         return (s_date, [content.get_buildin() for content in self])
-
 
     def __getitem__(self, ind):
         return self._contents[ind]
@@ -124,7 +118,6 @@ class Daily:
             contents=self._contents)
 
 
-
 class Kakebo:
 
     def __init__(self, first_money):
@@ -133,11 +126,10 @@ class Kakebo:
 
     def get_buildin_obj(self):
         buildin_dailies = list(map(
-                lambda daily: daily.get_buildin_obj(),
-                self._dailies))
+            lambda daily: daily.get_buildin_obj(),
+            self._dailies))
         print(buildin_dailies)
         return [self._first_money] + buildin_dailies
-
 
     def update(self, kakebo2):
         for diary in kakebo2:
@@ -149,7 +141,6 @@ class Kakebo:
     def get_first_money(self):
         return self._first_money
 
-
     def get_dailies(self):
         return deepcopy(self._dailies)
 
@@ -157,10 +148,8 @@ class Kakebo:
     def obtain_incomes(self):
         return [daily.obtain_income() for daily in self._dailies]
 
-
     def obtain_income(self):
         return sum(self.obtain_incomes())
-
 
     def _obtain_ignored_commentouted(self):
         """
@@ -173,9 +162,6 @@ class Kakebo:
 
         return kakebo
 
-
-
-
     def _obtain_ignore_contents(self):
         kakebo = Kakebo(None)
         for daily in self:
@@ -185,7 +171,6 @@ class Kakebo:
                     q_daily.append(content)
             kakebo.append(q_daily)
         return kakebo
-
 
     def print_statics(self, outfile=_stdout):
         # except ignore statics contents
@@ -221,12 +206,13 @@ class Kakebo:
         pylab.plot(dates, incomes, 'b-', label='data')
 
         # draw regression line
-            # loop and sedgement of regression line of this Kakebo
+        # loop and sedgement of regression line of this Kakebo
         from scipy import polyfit
         loop, sedgement = polyfit(dates, incomes, 1).tolist()
         # plot regression line of incomes
         pylab.plot(
-            dates, [loop * x + sedgement for x in dates], 'r-', label='regression line')
+            dates, [loop * x + sedgement for x in dates],
+            'r-', label='regression line')
 
         # show graph
         pylab.legend(loc='upper left')
@@ -240,7 +226,6 @@ class Kakebo:
             qed.append(contents)
         return qed
 
-
     def __len__(self):
         return len(self._dailies)
 
@@ -249,7 +234,6 @@ class Kakebo:
 
     def __repr__(self):
         return '\n'.join(map(str, self._dailies))
-
 
 
 def parse_date(s_date):
@@ -293,14 +277,6 @@ def main_test():
     jf = open('kakebo.json')
     kakebo = Kakebo.load_from_json(jf)
     kakebo.print_statics()
-
-
-
-def main(parser):
-    jf = open(filename, 'r')
-    kakebo = Kakebo.load_from_json(jf)
-    kakebo.print_statics()
-
 
 
 def build_options(parser):
@@ -359,6 +335,7 @@ def build_options(parser):
         help='output as plain text format'
     )
 
+
 def do_statics(kakebo):
     """
     clojure
@@ -366,9 +343,11 @@ def do_statics(kakebo):
     _do_statics = lambda: kakebo.print_statics()
     return _do_statics
 
+
 def do_plot(kakebo):
     _do_plot = lambda: kakebo.plot()
     return _do_plot
+
 
 def do_output_as_text(kakebo):
     def _do_output_as_text():
@@ -376,12 +355,13 @@ def do_output_as_text(kakebo):
         out_formatter.dump(kakebo, _stdout)
     return _do_output_as_text
 
+
 def do_option(kakebo, options):
     use_options = filter(
-            lambda opt: getattr(options, opt) is not None,
-            ('is_statics',
-             'is_plotting',
-             'output_as_text'))
+        lambda opt: getattr(options, opt) is not None,
+        ('is_statics',
+         'is_plotting',
+         'output_as_text'))
     use_options = list(use_options)
 
     if len(use_options) > 1:
@@ -401,10 +381,6 @@ def do_option(kakebo, options):
 
 
 def main():
-    from kakebo.formatter import TextFormatter as _TextFormatter
-    from kakebo.formatter import JsonFormatter as _JsonFormatter
-    from kakebo.formatter import YamlFormatter as _YamlFormatter
-    from kakebo.formatter import get_formatter as _get_formatter
 
     # define option
     parser = OptionParser(version='{}'.format(__version__))
@@ -416,7 +392,7 @@ def main():
         exit()
 
     # define Kakebo
-    ## define Kakebo with first_money
+    # define Kakebo with first_money
     filename = filenames[0]
     input_formatter = _get_formatter(filename)
     with open(filename, 'r') as f:
@@ -425,7 +401,7 @@ def main():
     del(filename)
     filenames = filenames[1:]
 
-    ## define continue filenames
+    # define continue filenames
     kakebo2 = None
     for filename in filenames:
         input_formatter = _get_formatter(filename)

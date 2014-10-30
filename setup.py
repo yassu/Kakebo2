@@ -25,7 +25,7 @@ setup(
     license='Apache License 2.0',
     packages=['kakebo'],
     include_package_data=True,
-    entry_points = {'console_scripts':
-            ['kakebo=kakebo.kakebo:main'],
-    }
+    entry_points={'console_scripts':
+                  ['kakebo=kakebo.kakebo:main'],
+                  }
 )
