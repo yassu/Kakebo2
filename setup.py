@@ -17,7 +17,7 @@ setup(
     name='kakebo',
     version=__version__,
     description='command for analysing you kakebo',
-    long_description=open('readme.markdown').read(),
+    long_description=open('readme.rst').read(),
     classifiers=classifiers,
     author="Yassu 0320",
     author_email='mathyassu at gmail.com',
