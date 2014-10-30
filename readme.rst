@@ -108,3 +108,7 @@ Please use one of `-g`, `--statics` or `-t` option.
   This is default as output.
 * `-t`, `--text` : convert to text-format from Kakebo. I think it is useful when
   you hand out kakebo to other, who is not programmer.
+
+License
+========
+Apache License 2.0
